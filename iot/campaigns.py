@@ -1,6 +1,8 @@
 """Experiment campaigns and CLI.  Usage: python -m iot.campaigns <campaign> [options]."""
 import argparse
 import csv
+import fcntl
+import io
 import json
 import os
 import shutil
@@ -23,22 +25,117 @@ class Ctx:
     def __init__(self, a):
         self.runs, self.samples, self.rate = a.runs, a.samples, a.rate
         self.out = a.out
+        self.resume = a.resume
+        self.active = []
+        os.makedirs(self.out, exist_ok=True)
+        manifest = os.path.join(self.out, "parameters.json")
+        parameters = {"samples": self.samples, "rate": self.rate}
+        if os.path.exists(manifest):
+            with open(manifest) as f:
+                if json.load(f) != parameters:
+                    raise ValueError("Output parameters differ; use another --out directory")
+        elif any(os.path.exists(os.path.join(self.out, f"{n}.csv")) for n in
+                 ("continuous", "emitter_restart", "directed", "receiver_restart")):
+            # Old versions did not record parameters. Only adopt the original
+            # full-specification results; do not mix them with quick runs.
+            if not self.resume or parameters != {"samples": 1000, "rate": 10}:
+                raise ValueError("Legacy CSVs require --resume with the original default parameters")
+        atomic_write(manifest, json.dumps(parameters, indent=2) + "\n")
         self.work = tempfile.mkdtemp(prefix="work-", dir=ROOT if a.keep else None)
         self.keep = a.keep
-        os.makedirs(self.out, exist_ok=True)
 
     def points(self):  # 250/500/750 for 1000 samples
         return [self.samples // 4, self.samples // 2, 3 * self.samples // 4]
 
     def run(self, policy, block):
-        return Run(self.work, policy, block, self.rate)
+        r = Run(self.work, policy, block, self.rate)
+        self.active.append(r)
+        return r
 
     def finish(self, r):
         m = r.metrics()
         r.close()
+        self.active.remove(r)
         if not self.keep:
             shutil.rmtree(r.dir, ignore_errors=True)
         return m
+
+    def close(self):
+        for r in self.active:
+            r.close()
+        self.active.clear()
+
+
+def atomic_write(path, content):
+    """Keep the previous checkpoint intact until its replacement is durable."""
+    if os.path.exists(path):
+        with open(path, newline="") as f:
+            if f.read() == content:
+                return
+    fd, tmp = tempfile.mkstemp(prefix=".checkpoint-", dir=os.path.dirname(path))
+    try:
+        with os.fdopen(fd, "w", newline="") as f:
+            f.write(content)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+        directory = os.open(os.path.dirname(path), os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+    finally:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+
+
+class CheckpointRows(list):
+    """Save each completed scenario and skip only matching, persisted rows."""
+
+    def __init__(self, ctx, name, *keys):
+        super().__init__()
+        self.ctx, self.name, self.keys = ctx, name, ("config", "run", *keys)
+        self.completed = set()
+        path = os.path.join(ctx.out, f"{name}.csv")
+        if not os.path.exists(path):
+            return
+        if not ctx.resume:
+            raise ValueError(f"{path} already exists; use --resume or another --out")
+        with open(path, newline="") as f:
+            for raw in csv.DictReader(f):
+                row = {}
+                for key, value in raw.items():
+                    if key is None or value is None:
+                        raise ValueError(f"Malformed checkpoint: {path}")
+                    if key in ("config", "point", "failure", "history",
+                               "rejections", "lost_samples", "recovery_s"):
+                        row[key] = value
+                    elif value in ("True", "False"):
+                        row[key] = value == "True"
+                    else:
+                        row[key] = json.loads(value) if value else None
+                for field in ("rejections", "lost_samples", "recovery_s"):
+                    json.loads(row[field])
+                identity = self.identity(row)
+                if identity in self.completed:
+                    raise ValueError(f"Duplicate checkpoint row in {path}: {identity}")
+                self.completed.add(identity)
+                super().append(row)
+        print(f"[{name}] loaded {len(self)} completed scenarios", flush=True)
+
+    def identity(self, row):
+        return tuple(str(row[k]) for k in self.keys)
+
+    def has(self, label, run_idx, **extra):
+        return self.identity({"config": label, "run": run_idx, **extra}) in self.completed
+
+    def append(self, row):
+        identity = self.identity(row)
+        if identity in self.completed:
+            raise ValueError(f"Scenario already saved: {identity}")
+        super().append(row)
+        save(self.ctx, self.name, self, quiet=True)
+        self.completed.add(identity)
 
 
 def flatten(label, run_idx, m, extra=None):
@@ -48,14 +145,16 @@ def flatten(label, run_idx, m, extra=None):
     return row
 
 
-def save(ctx, name, rows):
+def save(ctx, name, rows, quiet=False):
     path = os.path.join(ctx.out, f"{name}.csv")
     fields = list(dict.fromkeys(k for r in rows for k in r))
-    with open(path, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=fields)
-        w.writeheader()
-        w.writerows(rows)
-    print(f"[{name}] {len(rows)} rows -> {path}")
+    buf = io.StringIO(newline="")
+    w = csv.DictWriter(buf, fieldnames=fields)
+    w.writeheader()
+    w.writerows(rows)
+    atomic_write(path, buf.getvalue())
+    if not quiet:
+        print(f"[{name}] {len(rows)} rows -> {path}")
     return path
 
 
@@ -87,10 +186,12 @@ def summarize(rows, keys):
 # ------------------------------------------------------------------- campaigns
 def continuous(ctx):
     """Campaign 1: continuous operation without faults."""
-    rows = []
+    rows = CheckpointRows(ctx, "continuous")
     for i in range(ctx.runs):
         order = CONFIGS[i % len(CONFIGS):] + CONFIGS[:i % len(CONFIGS)]  # alternate order
         for label, policy, block in order:
+            if rows.has(label, i):
+                continue
             r = ctx.run(policy, block)
             r.start_receiver()
             r.start_emitter(0, ctx.samples).wait(ctx.samples / max(ctx.rate, 1) + 120
@@ -121,10 +222,12 @@ def emitter_failure(ctx, label, policy, block, point, after, total):
 
 def emitter_restart(ctx):
     """Campaign 2: emitter restarts after 250/500/750 completed encryptions, F3 crash."""
-    rows = []
+    rows = CheckpointRows(ctx, "emitter_restart", "restart_after")
     for i in range(ctx.runs):
         for label, policy, block in CONFIGS:
             for k in ctx.points():
+                if rows.has(label, i, restart_after=k):
+                    continue
                 m, crashed = emitter_failure(ctx, label, policy, block, "F3", k, ctx.samples)
                 rows.append(flatten(label, i, m, {"restart_after": k, "crashed": crashed}))
                 print(f"  emitter-restart {label} k={k} run {i} done", flush=True)
@@ -134,7 +237,7 @@ def emitter_restart(ctx):
 
 def directed(ctx):
     """Directed tests: F1-F3 and reserve-block transitions, only pertinent points."""
-    rows = []
+    rows = CheckpointRows(ctx, "directed", "point", "occurrence")
     for i in range(ctx.runs):
         for label, policy, block in CONFIGS:
             if policy == "C0":
@@ -145,6 +248,8 @@ def directed(ctx):
                 cases = [("F1", 1), ("F1", 2), ("F2", 1), ("F2", 2),
                          ("F3", 1), ("F3", block), ("F3", block + 1)]
             for point, n in cases:
+                if rows.has(label, i, point=point, occurrence=n):
+                    continue
                 encryptions_needed = n if point == "F3" else (n - 1) * block + 1
                 total = min(ctx.samples, encryptions_needed + 30)
                 m, crashed = emitter_failure(ctx, label, policy, block, point, n, total)
@@ -176,10 +281,12 @@ def receiver_failure(ctx, mode, volatile, k, total):
     else:
         em = r.start_emitter(0, total)
     if mode in ("F4", "F5"):
-        rx.wait(wait)
+        if rx.wait(wait) != c.CRASH_EXIT_CODE:
+            raise RuntimeError(f"Receiver did not reach {mode}#{k}; logs: {r.dir}")
         os.kill(em.p.pid, signal.SIGSTOP)  # keep emitter frozen while we recover
     elif mode == "receiver":
-        r.wait_for(lambda: r.count("receiver", "accepted") >= k, wait)
+        if not r.wait_for(lambda: r.count("receiver", "accepted") >= k, wait):
+            raise RuntimeError(f"Receiver did not accept {k} samples; logs: {r.dir}")
         os.kill(em.p.pid, signal.SIGSTOP)  # no new traffic during the failure window
         r.drain(0.5)
     frames, replay_samples = pick_replays(r)
@@ -208,14 +315,16 @@ def receiver_failure(ctx, mode, volatile, k, total):
 
 def receiver_restart(ctx):
     """Campaign 3: receiver / both-ends restarts, volatile vs persistent history."""
-    rows = []
+    rows = CheckpointRows(ctx, "receiver_restart", "failure", "history", "restart_after")
     scenarios = [("receiver", True), ("receiver", False), ("both", True), ("both", False),
                  ("F4", False), ("F5", False)]
     for i in range(ctx.runs):
         for mode, volatile in scenarios:
             for k in ctx.points():
-                _, m = receiver_failure(ctx, mode, volatile, k, ctx.samples)
                 hist = "volatile" if volatile else "persistent"
+                if rows.has("C1", i, failure=mode, history=hist, restart_after=k):
+                    continue
+                _, m = receiver_failure(ctx, mode, volatile, k, ctx.samples)
                 rows.append(flatten("C1", i, m, {"failure": mode, "history": hist,
                                                  "restart_after": k}))
                 print(f"  receiver-restart {mode} {hist} k={k} run {i} done", flush=True)
@@ -235,6 +344,8 @@ def integrity(ctx):
     results = []
     check = lambda name, ok: (results.append(ok), print(f"  [{'PASS' if ok else 'FAIL'}] {name}"))
     r = Run(ctx.work, "C1", 1, 0)
+    if hasattr(ctx, "active"):
+        ctx.active.append(r)
     r.start_receiver()
     r.start_emitter(0, 20).wait(60)
     r.drain()
@@ -302,6 +413,10 @@ CAMPAIGNS = {"integrity": integrity, "continuous": continuous,
              "receiver-restart": receiver_restart}
 
 
+def interrupted(signum, frame):
+    raise KeyboardInterrupt
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("campaign", choices=[*CAMPAIGNS, "all"])
@@ -310,19 +425,36 @@ def main():
     ap.add_argument("--rate", type=float, default=10, help="msgs/s (spec: 10, 0 = unthrottled)")
     ap.add_argument("--out", default=os.path.join(ROOT, "results"))
     ap.add_argument("--keep", action="store_true", help="keep run directories for inspection")
+    ap.add_argument("--resume", action="store_true", help="skip scenarios already saved in CSVs")
     ap.add_argument("--quick", action="store_true", help="2 runs, 300 samples, unthrottled")
     a = ap.parse_args()
     if a.quick:
         a.runs, a.samples, a.rate = 2, 300, 0
-    ctx = Ctx(a)
-    ok = True
-    try:
-        for name in (CAMPAIGNS if a.campaign == "all" else [a.campaign]):
-            print(f"\n=== {name} ===", flush=True)
-            ok &= CAMPAIGNS[name](ctx) is not False
-    finally:
-        if not a.keep:
-            shutil.rmtree(ctx.work, ignore_errors=True)
+    if a.runs < 1 or a.samples < 4 or a.rate < 0:
+        ap.error("--runs must be positive, --samples >= 4 and --rate >= 0")
+    os.makedirs(a.out, exist_ok=True)
+    with open(os.path.join(a.out, ".campaign.lock"), "a") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            ap.error("Another campaign is already using this --out directory")
+        ctx = Ctx(a)
+        ok = True
+        completed = False
+        old_handler = signal.signal(signal.SIGTERM, interrupted)
+        try:
+            for name in (CAMPAIGNS if a.campaign == "all" else [a.campaign]):
+                print(f"\n=== {name} ===", flush=True)
+                ok &= CAMPAIGNS[name](ctx) is not False
+            completed = True
+        finally:
+            signal.signal(signal.SIGTERM, old_handler)
+            ctx.close()
+            if completed and not a.keep:
+                shutil.rmtree(ctx.work, ignore_errors=True)
+            elif not completed:
+                print(f"Interrupted; completed rows are saved. Diagnostic files: {ctx.work}",
+                      flush=True)
     sys.exit(0 if ok else 1)
 
 

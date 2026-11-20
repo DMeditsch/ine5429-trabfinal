@@ -69,6 +69,7 @@ conda create -y -p ./.mosq -c conda-forge mosquitto
 .venv/bin/python -m iot.campaigns integrity         # tampering, replay, missing/invalid state
 .venv/bin/python -m iot.campaigns all --quick       # everything, 2 runs x 300 samples, unthrottled (~8 min)
 .venv/bin/python -m iot.campaigns all               # full specification (10 runs x 1000 samples @ 10 msg/s; many hours)
+.venv/bin/python -m iot.campaigns all --resume      # continue, skipping scenarios already saved
 ```
 
 Campaigns (`python -m iot.campaigns <name>`), results in `results/<name>.csv` (one row per run) plus a summary
@@ -82,7 +83,18 @@ table printed with median [min..max] across runs:
 | `directed` | campaign 2 | F1-F3 only where pertinent, including the first reserve and the transition between reserves |
 | `receiver-restart` | campaign 3 | emitter in C1; receiver or both ends restarted, volatile vs persistent receiver history, plus F4/F5; 20 previously accepted frames are replayed after the restart |
 
-Options: `--runs`, `--samples`, `--rate` (0 = unthrottled), `--out`, `--keep` (keep run dirs/logs), `--quick`.
+Options: `--runs`, `--samples`, `--rate` (0 = unthrottled), `--out`, `--keep` (keep run dirs/logs), `--quick`,
+`--resume`.
+
+Each completed scenario is saved immediately by atomically replacing its campaign CSV. After an
+interruption, repeat the same command with `--resume`: only missing scenarios are executed. Existing
+CSVs require `--resume` to prevent accidental overwrites. `parameters.json` records the sample count
+and rate and prevents mixing different settings; use a different `--out` directory for different
+parameters. A directory lock prevents two controllers from writing the same results concurrently.
+Legacy CSVs without parameter metadata can be resumed with the original defaults (1000 samples,
+10 msg/s). Legacy campaigns interrupted before their final CSV was written must be rerun.
+The short `integrity` check runs again on `all --resume`. Unexpected child exits or timeouts abort
+without saving the incomplete scenario; completed CSV rows and diagnostic files remain available.
 
 Metrics (CSV columns): `nonce_reuse` (encryptions repeating a key-nonce pair), `duplicate_acceptances`
 (replays producing a new acceptance), `replays_sent/reached/accepted` (campaign 3), `rejections` and

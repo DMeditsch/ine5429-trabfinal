@@ -32,33 +32,41 @@ class Proc:
 
     def __init__(self, run, module, args):
         self.run, self.name = run, module
-        log = open(os.path.join(run.dir, f"{module}.log"), "ab")
-        self.p = subprocess.Popen([sys.executable, "-m", f"iot.{module}", *map(str, args)],
-                                  cwd=ROOT, stdout=subprocess.PIPE, stderr=log)
-        threading.Thread(target=self._read, daemon=True).start()
+        with open(os.path.join(run.dir, f"{module}.log"), "ab") as log:
+            self.p = subprocess.Popen([sys.executable, "-m", f"iot.{module}", *map(str, args)],
+                                      cwd=ROOT, stdout=subprocess.PIPE, stderr=log)
+        self.reader = threading.Thread(target=self._read, daemon=True)
+        self.reader.start()
 
     def _read(self):
-        for line in self.p.stdout:
-            try:
-                ev = json.loads(line)
-            except ValueError:
-                continue
-            ev.update(src=self.name, t=time.monotonic(), pid=self.p.pid)
-            with self.run.lock:
-                self.run.events.append(ev)
+        with self.p.stdout:
+            for line in self.p.stdout:
+                try:
+                    ev = json.loads(line)
+                except ValueError:
+                    continue
+                ev.update(src=self.name, t=time.monotonic(), pid=self.p.pid)
+                with self.run.lock:
+                    self.run.events.append(ev)
 
     def wait(self, timeout):
         try:
             code = self.p.wait(timeout)
         except subprocess.TimeoutExpired:
-            return None
-        time.sleep(0.2)  # let the reader thread flush the last lines
+            self.kill()
+            raise RuntimeError(f"{self.name} timed out after {timeout}s; logs: {self.run.dir}")
+        self.reader.join(timeout=5)
+        if self.reader.is_alive():
+            raise RuntimeError(f"{self.name} event reader did not finish")
+        if code not in (0, c.CRASH_EXIT_CODE):
+            raise RuntimeError(f"{self.name} exited with code {code}; logs: {self.run.dir}")
         return code
 
     def kill(self):
         if self.p.poll() is None:
             self.p.kill()
-            self.p.wait()
+        self.p.wait(timeout=10)
+        self.reader.join(timeout=5)
 
 
 class Run:
@@ -69,12 +77,17 @@ class Run:
         self.dir = tempfile.mkdtemp(prefix="run-", dir=root)
         self.policy, self.block, self.rate = policy, block, rate
         self.events, self.lock, self.restarts, self.procs = [], threading.Lock(), [], []
-        self.provision()
-        self.start_broker()
-        self.tap = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="controller",
-                               protocol=mqtt.MQTTv311)
-        self.tap.connect("127.0.0.1", self.port)
-        self.tap.loop_start()
+        self.tap = self.broker = None
+        try:
+            self.provision()
+            self.start_broker()
+            self.tap = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="controller",
+                                   protocol=mqtt.MQTTv311)
+            self.tap.connect("127.0.0.1", self.port)
+            self.tap.loop_start()
+        except BaseException:
+            self.close()
+            raise
 
     # ------------------------------------------------------------ provisioning
     def provision(self, device="dev-1", key_id="k1"):
@@ -178,9 +191,21 @@ class Run:
     def close(self):
         for p in self.procs:
             p.kill()
-        self.tap.loop_stop()
-        self.broker.terminate()
-        self.broker.wait()
+        self.procs.clear()
+        if self.tap is not None:
+            self.tap.disconnect()
+            self.tap.loop_stop()
+            # Paho keeps its wakeup socket pair until destruction. Release the
+            # client now, even when callers retain this Run for its metrics.
+            self.tap = None
+        if self.broker is not None:
+            self.broker.terminate()
+            try:
+                self.broker.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                self.broker.kill()
+                self.broker.wait(timeout=5)
+            self.broker = None
 
     # ----------------------------------------------------------------- metrics
     def metrics(self):
