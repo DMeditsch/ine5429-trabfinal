@@ -1,5 +1,13 @@
 # AES-GCM over MQTT: security after restarts
 
+## Results and Analysis
+
+The Portuguese analysis of the complete campaigns is available in
+[Results Analysis — AES-GCM in IoT](analise/README.md), featuring a description of the
+670 trials, an evaluation of the partial report hypotheses, tables, instrumentation
+limitations, and chart suggestions. The chart data and reproducible aggregation
+script are located in `analise/`.
+
 Software-only implementation of the experiment described in *"AES-GCM em IoT: segurança após reinícios"*:
 an emitter encrypts synthetic telemetry with AES-256-GCM and publishes it over MQTT; a receiver verifies,
 rejects replays, and decrypts. Three nonce-management policies are compared under controlled crashes,
@@ -103,11 +111,15 @@ Metrics (CSV columns): `nonce_reuse` (encryptions repeating a key-nonce pair), `
 (frame preparation: reserve commit if any + encryption + serialization), `recovery_s` (restart command to
 first acceptance of a new sample; `null` = none within 10 s).
 
+The transaction counters rely on subsequent encryption/acceptance events: they omit a commit immediately
+followed by F2/F5. In F5, acceptance events represent delivery rather than every durable acceptance.
+See the [results analysis](analise/README.md) for these measurement limits and the first-reservation discard gap.
+
 ## Expected results and caveats
 
 - C0 reuses nonces after a restart (and loses data while the reset sequence is `<= h`); C1/C2 never do.
 - C2 cuts emitter transactions by about B and keeps preparation latency near C0's median, at the cost of
-  discarding up to B-1 sequences per restart.
+  discarding up to B-1 sequences after F3, or a whole unused block of B sequences after F2.
 - A persistent receiver rejects all replays; a volatile one accepts them after a restart.
 - F5 loses delivery of one message but never accepts it twice (no exactly-once guarantee).
 - With `--rate 0` the emitter may finish before a late restart point, so `recovery_s` can be `null` for the
