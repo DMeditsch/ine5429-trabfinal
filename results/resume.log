@@ -1,0 +1,584 @@
+
+=== integrity ===
+  [PASS] legitimate frames accepted
+  [PASS] exact replay rejected
+  [PASS] tampered ciphertext rejected
+  [PASS] tampered tag rejected
+  [PASS] tampered header (AAD) rejected
+  [PASS] tampered nonce rejected
+  [PASS] accepted count unchanged
+  [PASS] receiver history h unchanged by forged frames
+  [PASS] emitter aborts on invalid state
+  [PASS] emitter aborts on missing record
+  [PASS] emitter aborts on missing state file
+  [PASS] emitter aborts on corrupt state file
+  [PASS] receiver aborts on missing record
+
+integrity: 13/13 checks passed
+
+=== continuous ===
+[continuous] loaded 50 completed scenarios
+[continuous] 50 rows -> /home/jonatan/Documentos/UFSC/SEGURANCA/trabalho-final/results/continuous.csv
+
+config | encryptions | nonce_reuse | duplicate_acceptances | emitter_transactions | receiver_transactions | discarded_sequences | prep_median_us | prep_p95_us | lost | recovered | recovery_median_s
+C0 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 0 [0..0] | 226 [185..231] | 234.5 [212..243] | 0 [0..0] | - | -
+C1 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 1000 [1000..1000] | 0 [0..0] | 251 [240..282] | 301 [281..304] | 0 [0..0] | - | -
+C2-16 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 63 [63..63] | 1000 [1000..1000] | 0 [0..0] | 221 [185..230] | 263 [239..295] | 0 [0..0] | - | -
+C2-64 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 16 [16..16] | 1000 [1000..1000] | 0 [0..0] | 218 [186..230] | 235 [229..251] | 0 [0..0] | - | -
+C2-256 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 4 [4..4] | 1000 [1000..1000] | 0 [0..0] | 196.25 [184..229] | 230.5 [208..235] | 0 [0..0] | - | -
+
+=== emitter-restart ===
+[emitter_restart] loaded 150 completed scenarios
+[emitter_restart] 150 rows -> /home/jonatan/Documentos/UFSC/SEGURANCA/trabalho-final/results/emitter_restart.csv
+
+config | restart_after | encryptions | nonce_reuse | duplicate_acceptances | emitter_transactions | receiver_transactions | discarded_sequences | prep_median_us | prep_p95_us | lost | recovered | recovery_median_s
+C0 | 250 | 1000 [1000..1000] | 250 [250..250] | 0 [0..0] | 0 [0..0] | 750 [750..750] | 0 [0..0] | 211 [169..229.5] | 236.5 [232..247] | 250 [250..250] | 0/10 | -
+C0 | 500 | 1000 [1000..1000] | 500 [500..500] | 0 [0..0] | 0 [0..0] | 500 [500..500] | 0 [0..0] | 209 [167.5..227] | 236.5 [227..251] | 500 [500..500] | 0/10 | -
+C0 | 750 | 1000 [1000..1000] | 250 [250..250] | 0 [0..0] | 0 [0..0] | 750 [750..750] | 0 [0..0] | 188.75 [171..230] | 240.5 [231..248] | 250 [250..250] | 0/10 | -
+C1 | 250 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 1000 [1000..1000] | 0 [0..0] | 242.5 [221..298] | 304.5 [297..315] | 0 [0..0] | 10/10 | 0.06
+C1 | 500 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 1000 [1000..1000] | 0 [0..0] | 266.25 [229.5..298] | 308.5 [293..339] | 0 [0..0] | 10/10 | 0.07
+C1 | 750 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 1000 [1000..1000] | 0 [0..0] | 244.75 [221..301] | 310.5 [287..468] | 0 [0..0] | 10/10 | 0.06
+C2-16 | 250 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 63 [63..63] | 1000 [1000..1000] | 6 [6..6] | 202 [168..251] | 251.5 [242..352] | 0 [0..0] | 10/10 | 0.06
+C2-16 | 500 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 64 [64..64] | 1000 [1000..1000] | 12 [12..12] | 194 [178..252] | 256 [243..409] | 0 [0..0] | 10/10 | 0.07
+C2-16 | 750 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 63 [63..63] | 1000 [1000..1000] | 2 [2..2] | 210 [172..258] | 263 [253..392] | 0 [0..0] | 10/10 | 0.07
+C2-64 | 250 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 16 [16..16] | 1000 [1000..1000] | 6 [6..6] | 191 [174..243.5] | 243 [233..336] | 0 [0..0] | 10/10 | 0.07
+C2-64 | 500 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 16 [16..16] | 1000 [1000..1000] | 12 [12..12] | 193 [169..230] | 239.5 [232..267] | 0 [0..0] | 10/10 | 0.06
+C2-64 | 750 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 16 [16..16] | 1000 [1000..1000] | 18 [18..18] | 185 [168..229] | 240.5 [228..299] | 0 [0..0] | 10/10 | 0.07
+C2-256 | 250 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 4 [4..4] | 1000 [1000..1000] | 6 [6..6] | 180 [169..229] | 241 [231..258] | 0 [0..0] | 10/10 | 0.07
+C2-256 | 500 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 4 [4..4] | 1000 [1000..1000] | 12 [12..12] | 193.25 [170..209] | 241.5 [235..248] | 0 [0..0] | 10/10 | 0.06
+C2-256 | 750 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 4 [4..4] | 1000 [1000..1000] | 18 [18..18] | 193.5 [170..230] | 240 [232..253] | 0 [0..0] | 10/10 | 0.06
+
+=== directed ===
+  directed C0 F3#1 run 0 done
+  directed C0 F3#2 run 0 done
+  directed C1 F1#1 run 0 done
+  directed C1 F1#2 run 0 done
+  directed C1 F2#1 run 0 done
+  directed C1 F2#2 run 0 done
+  directed C1 F3#1 run 0 done
+  directed C1 F3#2 run 0 done
+  directed C2-16 F1#1 run 0 done
+  directed C2-16 F1#2 run 0 done
+  directed C2-16 F2#1 run 0 done
+  directed C2-16 F2#2 run 0 done
+  directed C2-16 F3#1 run 0 done
+  directed C2-16 F3#16 run 0 done
+  directed C2-16 F3#17 run 0 done
+  directed C2-64 F1#1 run 0 done
+  directed C2-64 F1#2 run 0 done
+  directed C2-64 F2#1 run 0 done
+  directed C2-64 F2#2 run 0 done
+  directed C2-64 F3#1 run 0 done
+  directed C2-64 F3#64 run 0 done
+  directed C2-64 F3#65 run 0 done
+  directed C2-256 F1#1 run 0 done
+  directed C2-256 F1#2 run 0 done
+  directed C2-256 F2#1 run 0 done
+  directed C2-256 F2#2 run 0 done
+  directed C2-256 F3#1 run 0 done
+  directed C2-256 F3#256 run 0 done
+  directed C2-256 F3#257 run 0 done
+  directed C0 F3#1 run 1 done
+  directed C0 F3#2 run 1 done
+  directed C1 F1#1 run 1 done
+  directed C1 F1#2 run 1 done
+  directed C1 F2#1 run 1 done
+  directed C1 F2#2 run 1 done
+  directed C1 F3#1 run 1 done
+  directed C1 F3#2 run 1 done
+  directed C2-16 F1#1 run 1 done
+  directed C2-16 F1#2 run 1 done
+  directed C2-16 F2#1 run 1 done
+  directed C2-16 F2#2 run 1 done
+  directed C2-16 F3#1 run 1 done
+  directed C2-16 F3#16 run 1 done
+  directed C2-16 F3#17 run 1 done
+  directed C2-64 F1#1 run 1 done
+  directed C2-64 F1#2 run 1 done
+  directed C2-64 F2#1 run 1 done
+  directed C2-64 F2#2 run 1 done
+  directed C2-64 F3#1 run 1 done
+  directed C2-64 F3#64 run 1 done
+  directed C2-64 F3#65 run 1 done
+  directed C2-256 F1#1 run 1 done
+  directed C2-256 F1#2 run 1 done
+  directed C2-256 F2#1 run 1 done
+  directed C2-256 F2#2 run 1 done
+  directed C2-256 F3#1 run 1 done
+  directed C2-256 F3#256 run 1 done
+  directed C2-256 F3#257 run 1 done
+  directed C0 F3#1 run 2 done
+  directed C0 F3#2 run 2 done
+  directed C1 F1#1 run 2 done
+  directed C1 F1#2 run 2 done
+  directed C1 F2#1 run 2 done
+  directed C1 F2#2 run 2 done
+  directed C1 F3#1 run 2 done
+  directed C1 F3#2 run 2 done
+  directed C2-16 F1#1 run 2 done
+  directed C2-16 F1#2 run 2 done
+  directed C2-16 F2#1 run 2 done
+  directed C2-16 F2#2 run 2 done
+  directed C2-16 F3#1 run 2 done
+  directed C2-16 F3#16 run 2 done
+  directed C2-16 F3#17 run 2 done
+  directed C2-64 F1#1 run 2 done
+  directed C2-64 F1#2 run 2 done
+  directed C2-64 F2#1 run 2 done
+  directed C2-64 F2#2 run 2 done
+  directed C2-64 F3#1 run 2 done
+  directed C2-64 F3#64 run 2 done
+  directed C2-64 F3#65 run 2 done
+  directed C2-256 F1#1 run 2 done
+  directed C2-256 F1#2 run 2 done
+  directed C2-256 F2#1 run 2 done
+  directed C2-256 F2#2 run 2 done
+  directed C2-256 F3#1 run 2 done
+  directed C2-256 F3#256 run 2 done
+  directed C2-256 F3#257 run 2 done
+  directed C0 F3#1 run 3 done
+  directed C0 F3#2 run 3 done
+  directed C1 F1#1 run 3 done
+  directed C1 F1#2 run 3 done
+  directed C1 F2#1 run 3 done
+  directed C1 F2#2 run 3 done
+  directed C1 F3#1 run 3 done
+  directed C1 F3#2 run 3 done
+  directed C2-16 F1#1 run 3 done
+  directed C2-16 F1#2 run 3 done
+  directed C2-16 F2#1 run 3 done
+  directed C2-16 F2#2 run 3 done
+  directed C2-16 F3#1 run 3 done
+  directed C2-16 F3#16 run 3 done
+  directed C2-16 F3#17 run 3 done
+  directed C2-64 F1#1 run 3 done
+  directed C2-64 F1#2 run 3 done
+  directed C2-64 F2#1 run 3 done
+  directed C2-64 F2#2 run 3 done
+  directed C2-64 F3#1 run 3 done
+  directed C2-64 F3#64 run 3 done
+  directed C2-64 F3#65 run 3 done
+  directed C2-256 F1#1 run 3 done
+  directed C2-256 F1#2 run 3 done
+  directed C2-256 F2#1 run 3 done
+  directed C2-256 F2#2 run 3 done
+  directed C2-256 F3#1 run 3 done
+  directed C2-256 F3#256 run 3 done
+  directed C2-256 F3#257 run 3 done
+  directed C0 F3#1 run 4 done
+  directed C0 F3#2 run 4 done
+  directed C1 F1#1 run 4 done
+  directed C1 F1#2 run 4 done
+  directed C1 F2#1 run 4 done
+  directed C1 F2#2 run 4 done
+  directed C1 F3#1 run 4 done
+  directed C1 F3#2 run 4 done
+  directed C2-16 F1#1 run 4 done
+  directed C2-16 F1#2 run 4 done
+  directed C2-16 F2#1 run 4 done
+  directed C2-16 F2#2 run 4 done
+  directed C2-16 F3#1 run 4 done
+  directed C2-16 F3#16 run 4 done
+  directed C2-16 F3#17 run 4 done
+  directed C2-64 F1#1 run 4 done
+  directed C2-64 F1#2 run 4 done
+  directed C2-64 F2#1 run 4 done
+  directed C2-64 F2#2 run 4 done
+  directed C2-64 F3#1 run 4 done
+  directed C2-64 F3#64 run 4 done
+  directed C2-64 F3#65 run 4 done
+  directed C2-256 F1#1 run 4 done
+  directed C2-256 F1#2 run 4 done
+  directed C2-256 F2#1 run 4 done
+  directed C2-256 F2#2 run 4 done
+  directed C2-256 F3#1 run 4 done
+  directed C2-256 F3#256 run 4 done
+  directed C2-256 F3#257 run 4 done
+  directed C0 F3#1 run 5 done
+  directed C0 F3#2 run 5 done
+  directed C1 F1#1 run 5 done
+  directed C1 F1#2 run 5 done
+  directed C1 F2#1 run 5 done
+  directed C1 F2#2 run 5 done
+  directed C1 F3#1 run 5 done
+  directed C1 F3#2 run 5 done
+  directed C2-16 F1#1 run 5 done
+  directed C2-16 F1#2 run 5 done
+  directed C2-16 F2#1 run 5 done
+  directed C2-16 F2#2 run 5 done
+  directed C2-16 F3#1 run 5 done
+  directed C2-16 F3#16 run 5 done
+  directed C2-16 F3#17 run 5 done
+  directed C2-64 F1#1 run 5 done
+  directed C2-64 F1#2 run 5 done
+  directed C2-64 F2#1 run 5 done
+  directed C2-64 F2#2 run 5 done
+  directed C2-64 F3#1 run 5 done
+  directed C2-64 F3#64 run 5 done
+  directed C2-64 F3#65 run 5 done
+  directed C2-256 F1#1 run 5 done
+  directed C2-256 F1#2 run 5 done
+  directed C2-256 F2#1 run 5 done
+  directed C2-256 F2#2 run 5 done
+  directed C2-256 F3#1 run 5 done
+  directed C2-256 F3#256 run 5 done
+  directed C2-256 F3#257 run 5 done
+  directed C0 F3#1 run 6 done
+  directed C0 F3#2 run 6 done
+  directed C1 F1#1 run 6 done
+  directed C1 F1#2 run 6 done
+  directed C1 F2#1 run 6 done
+  directed C1 F2#2 run 6 done
+  directed C1 F3#1 run 6 done
+  directed C1 F3#2 run 6 done
+  directed C2-16 F1#1 run 6 done
+  directed C2-16 F1#2 run 6 done
+  directed C2-16 F2#1 run 6 done
+  directed C2-16 F2#2 run 6 done
+  directed C2-16 F3#1 run 6 done
+  directed C2-16 F3#16 run 6 done
+  directed C2-16 F3#17 run 6 done
+  directed C2-64 F1#1 run 6 done
+  directed C2-64 F1#2 run 6 done
+  directed C2-64 F2#1 run 6 done
+  directed C2-64 F2#2 run 6 done
+  directed C2-64 F3#1 run 6 done
+  directed C2-64 F3#64 run 6 done
+  directed C2-64 F3#65 run 6 done
+  directed C2-256 F1#1 run 6 done
+  directed C2-256 F1#2 run 6 done
+  directed C2-256 F2#1 run 6 done
+  directed C2-256 F2#2 run 6 done
+  directed C2-256 F3#1 run 6 done
+  directed C2-256 F3#256 run 6 done
+  directed C2-256 F3#257 run 6 done
+  directed C0 F3#1 run 7 done
+  directed C0 F3#2 run 7 done
+  directed C1 F1#1 run 7 done
+  directed C1 F1#2 run 7 done
+  directed C1 F2#1 run 7 done
+  directed C1 F2#2 run 7 done
+  directed C1 F3#1 run 7 done
+  directed C1 F3#2 run 7 done
+  directed C2-16 F1#1 run 7 done
+  directed C2-16 F1#2 run 7 done
+  directed C2-16 F2#1 run 7 done
+  directed C2-16 F2#2 run 7 done
+  directed C2-16 F3#1 run 7 done
+  directed C2-16 F3#16 run 7 done
+  directed C2-16 F3#17 run 7 done
+  directed C2-64 F1#1 run 7 done
+  directed C2-64 F1#2 run 7 done
+  directed C2-64 F2#1 run 7 done
+  directed C2-64 F2#2 run 7 done
+  directed C2-64 F3#1 run 7 done
+  directed C2-64 F3#64 run 7 done
+  directed C2-64 F3#65 run 7 done
+  directed C2-256 F1#1 run 7 done
+  directed C2-256 F1#2 run 7 done
+  directed C2-256 F2#1 run 7 done
+  directed C2-256 F2#2 run 7 done
+  directed C2-256 F3#1 run 7 done
+  directed C2-256 F3#256 run 7 done
+  directed C2-256 F3#257 run 7 done
+  directed C0 F3#1 run 8 done
+  directed C0 F3#2 run 8 done
+  directed C1 F1#1 run 8 done
+  directed C1 F1#2 run 8 done
+  directed C1 F2#1 run 8 done
+  directed C1 F2#2 run 8 done
+  directed C1 F3#1 run 8 done
+  directed C1 F3#2 run 8 done
+  directed C2-16 F1#1 run 8 done
+  directed C2-16 F1#2 run 8 done
+  directed C2-16 F2#1 run 8 done
+  directed C2-16 F2#2 run 8 done
+  directed C2-16 F3#1 run 8 done
+  directed C2-16 F3#16 run 8 done
+  directed C2-16 F3#17 run 8 done
+  directed C2-64 F1#1 run 8 done
+  directed C2-64 F1#2 run 8 done
+  directed C2-64 F2#1 run 8 done
+  directed C2-64 F2#2 run 8 done
+  directed C2-64 F3#1 run 8 done
+  directed C2-64 F3#64 run 8 done
+  directed C2-64 F3#65 run 8 done
+  directed C2-256 F1#1 run 8 done
+  directed C2-256 F1#2 run 8 done
+  directed C2-256 F2#1 run 8 done
+  directed C2-256 F2#2 run 8 done
+  directed C2-256 F3#1 run 8 done
+  directed C2-256 F3#256 run 8 done
+  directed C2-256 F3#257 run 8 done
+  directed C0 F3#1 run 9 done
+  directed C0 F3#2 run 9 done
+  directed C1 F1#1 run 9 done
+  directed C1 F1#2 run 9 done
+  directed C1 F2#1 run 9 done
+  directed C1 F2#2 run 9 done
+  directed C1 F3#1 run 9 done
+  directed C1 F3#2 run 9 done
+  directed C2-16 F1#1 run 9 done
+  directed C2-16 F1#2 run 9 done
+  directed C2-16 F2#1 run 9 done
+  directed C2-16 F2#2 run 9 done
+  directed C2-16 F3#1 run 9 done
+  directed C2-16 F3#16 run 9 done
+  directed C2-16 F3#17 run 9 done
+  directed C2-64 F1#1 run 9 done
+  directed C2-64 F1#2 run 9 done
+  directed C2-64 F2#1 run 9 done
+  directed C2-64 F2#2 run 9 done
+  directed C2-64 F3#1 run 9 done
+  directed C2-64 F3#64 run 9 done
+  directed C2-64 F3#65 run 9 done
+  directed C2-256 F1#1 run 9 done
+  directed C2-256 F1#2 run 9 done
+  directed C2-256 F2#1 run 9 done
+  directed C2-256 F2#2 run 9 done
+  directed C2-256 F3#1 run 9 done
+  directed C2-256 F3#256 run 9 done
+  directed C2-256 F3#257 run 9 done
+[directed] 290 rows -> /home/jonatan/Documentos/UFSC/SEGURANCA/trabalho-final/results/directed.csv
+
+config | point | occurrence | encryptions | nonce_reuse | duplicate_acceptances | emitter_transactions | receiver_transactions | discarded_sequences | prep_median_us | prep_p95_us | lost | recovered | recovery_median_s
+C0 | F3 | 1 | 31 [31..31] | 1 [1..1] | 0 [0..0] | 0 [0..0] | 30 [30..30] | 0 [0..0] | 214.5 [166..239] | 2021.5 [1887..2979] | 1 [1..1] | 10/10 | 0.16
+C0 | F3 | 2 | 32 [32..32] | 2 [2..2] | 0 [0..0] | 0 [0..0] | 30 [30..30] | 0 [0..0] | 193.25 [169.5..259] | 1941.5 [1913..2840] | 2 [2..2] | 10/10 | 0.26
+C1 | F1 | 1 | 31 [31..31] | 0 [0..0] | 0 [0..0] | 31 [31..31] | 31 [31..31] | 0 [0..0] | 223 [220..299] | 303.5 [252..484] | 0 [0..0] | 10/10 | 0.07
+C1 | F1 | 2 | 32 [32..32] | 0 [0..0] | 0 [0..0] | 32 [32..32] | 32 [32..32] | 0 [0..0] | 249.75 [221.5..310] | 2179.5 [1968..2898] | 0 [0..0] | 10/10 | 0.06
+C1 | F2 | 1 | 31 [31..31] | 0 [0..0] | 0 [0..0] | 31 [31..31] | 31 [31..31] | 0 [0..0] | 255.5 [229..301] | 341.5 [293..496] | 0 [0..0] | 10/10 | 0.07
+C1 | F2 | 2 | 32 [32..32] | 0 [0..0] | 0 [0..0] | 32 [32..32] | 32 [32..32] | 1 [1..1] | 229.75 [219..298] | 2065.5 [2001..2856] | 0 [0..0] | 10/10 | 0.06
+C1 | F3 | 1 | 31 [31..31] | 0 [0..0] | 0 [0..0] | 31 [31..31] | 31 [31..31] | 0 [0..0] | 234 [219..259] | 2049.5 [1975..2952] | 0 [0..0] | 10/10 | 0.07
+C1 | F3 | 2 | 32 [32..32] | 0 [0..0] | 0 [0..0] | 32 [32..32] | 32 [32..32] | 0 [0..0] | 230 [219.5..302] | 2011.5 [1965..2912] | 0 [0..0] | 10/10 | 0.06
+C2-16 | F1 | 1 | 31 [31..31] | 0 [0..0] | 0 [0..0] | 2 [2..2] | 31 [31..31] | 0 [0..0] | 190 [168..231] | 274.5 [218..401] | 0 [0..0] | 10/10 | 0.06
+C2-16 | F1 | 2 | 47 [47..47] | 0 [0..0] | 0 [0..0] | 3 [3..3] | 47 [47..47] | 0 [0..0] | 187.5 [174..228] | 300.5 [243..354] | 0 [0..0] | 10/10 | 0.06
+C2-16 | F2 | 1 | 31 [31..31] | 0 [0..0] | 0 [0..0] | 2 [2..2] | 31 [31..31] | 0 [0..0] | 200 [180..232] | 283.5 [238..560] | 0 [0..0] | 10/10 | 0.07
+C2-16 | F2 | 2 | 47 [47..47] | 0 [0..0] | 0 [0..0] | 3 [3..3] | 47 [47..47] | 16 [16..16] | 182.5 [171..230] | 298.5 [234..564] | 0 [0..0] | 10/10 | 0.07
+C2-16 | F3 | 1 | 31 [31..31] | 0 [0..0] | 0 [0..0] | 3 [3..3] | 31 [31..31] | 15 [15..15] | 171 [168..231] | 2030 [1976..2118] | 0 [0..0] | 10/10 | 0.06
+C2-16 | F3 | 16 | 46 [46..46] | 0 [0..0] | 0 [0..0] | 3 [3..3] | 46 [46..46] | 0 [0..0] | 179 [168..206] | 272.5 [222..369] | 0 [0..0] | 10/10 | 0.06
+C2-16 | F3 | 17 | 47 [47..47] | 0 [0..0] | 0 [0..0] | 4 [4..4] | 47 [47..47] | 15 [15..15] | 190.5 [170..231] | 310.5 [233..466] | 0 [0..0] | 10/10 | 0.07
+C2-64 | F1 | 1 | 31 [31..31] | 0 [0..0] | 0 [0..0] | 1 [1..1] | 31 [31..31] | 0 [0..0] | 181 [169..232] | 250.5 [209..289] | 0 [0..0] | 10/10 | 0.07
+C2-64 | F1 | 2 | 95 [95..95] | 0 [0..0] | 0 [0..0] | 2 [2..2] | 95 [95..95] | 0 [0..0] | 180.5 [167..229] | 253 [206..411] | 0 [0..0] | 10/10 | 0.06
+C2-64 | F2 | 1 | 31 [31..31] | 0 [0..0] | 0 [0..0] | 1 [1..1] | 31 [31..31] | 0 [0..0] | 170 [166..230] | 242 [214..352] | 0 [0..0] | 10/10 | 0.07
+C2-64 | F2 | 2 | 95 [95..95] | 0 [0..0] | 0 [0..0] | 2 [2..2] | 95 [95..95] | 64 [64..64] | 179 [169..229] | 258 [227..294] | 0 [0..0] | 10/10 | 0.06
+C2-64 | F3 | 1 | 31 [31..31] | 0 [0..0] | 0 [0..0] | 2 [2..2] | 31 [31..31] | 63 [63..63] | 177.5 [167..235] | 2080.5 [1968..2978] | 0 [0..0] | 10/10 | 0.07
+C2-64 | F3 | 64 | 94 [94..94] | 0 [0..0] | 0 [0..0] | 2 [2..2] | 94 [94..94] | 0 [0..0] | 182 [171.5..228] | 266.5 [242..327] | 0 [0..0] | 10/10 | 0.06
+C2-64 | F3 | 65 | 95 [95..95] | 0 [0..0] | 0 [0..0] | 3 [3..3] | 95 [95..95] | 63 [63..63] | 187.5 [171..230] | 259.5 [229..323] | 0 [0..0] | 10/10 | 0.06
+C2-256 | F1 | 1 | 31 [31..31] | 0 [0..0] | 0 [0..0] | 1 [1..1] | 31 [31..31] | 0 [0..0] | 177.5 [168..232] | 247.5 [206..800] | 0 [0..0] | 10/10 | 0.07
+C2-256 | F1 | 2 | 287 [287..287] | 0 [0..0] | 0 [0..0] | 2 [2..2] | 287 [287..287] | 0 [0..0] | 195 [169..204] | 249 [219..285] | 0 [0..0] | 10/10 | 0.07
+C2-256 | F2 | 1 | 31 [31..31] | 0 [0..0] | 0 [0..0] | 1 [1..1] | 31 [31..31] | 0 [0..0] | 172.5 [167..232] | 254.5 [229..303] | 0 [0..0] | 10/10 | 0.07
+C2-256 | F2 | 2 | 287 [287..287] | 0 [0..0] | 0 [0..0] | 2 [2..2] | 287 [287..287] | 256 [256..256] | 172.5 [168..231] | 249 [218..278] | 0 [0..0] | 10/10 | 0.06
+C2-256 | F3 | 1 | 31 [31..31] | 0 [0..0] | 0 [0..0] | 2 [2..2] | 31 [31..31] | 255 [255..255] | 227.5 [170..236] | 2099 [1988..3231] | 0 [0..0] | 10/10 | 0.07
+C2-256 | F3 | 256 | 286 [286..286] | 0 [0..0] | 0 [0..0] | 2 [2..2] | 286 [286..286] | 0 [0..0] | 191.75 [181.5..231] | 247 [237..280] | 0 [0..0] | 10/10 | 0.06
+C2-256 | F3 | 257 | 287 [287..287] | 0 [0..0] | 0 [0..0] | 3 [3..3] | 287 [287..287] | 255 [255..255] | 195.5 [167..231] | 251 [214..278] | 0 [0..0] | 10/10 | 0.07
+
+=== receiver-restart ===
+  receiver-restart receiver volatile k=250 run 0 done
+  receiver-restart receiver volatile k=500 run 0 done
+  receiver-restart receiver volatile k=750 run 0 done
+  receiver-restart receiver persistent k=250 run 0 done
+  receiver-restart receiver persistent k=500 run 0 done
+  receiver-restart receiver persistent k=750 run 0 done
+  receiver-restart both volatile k=250 run 0 done
+  receiver-restart both volatile k=500 run 0 done
+  receiver-restart both volatile k=750 run 0 done
+  receiver-restart both persistent k=250 run 0 done
+  receiver-restart both persistent k=500 run 0 done
+  receiver-restart both persistent k=750 run 0 done
+  receiver-restart F4 persistent k=250 run 0 done
+  receiver-restart F4 persistent k=500 run 0 done
+  receiver-restart F4 persistent k=750 run 0 done
+  receiver-restart F5 persistent k=250 run 0 done
+  receiver-restart F5 persistent k=500 run 0 done
+  receiver-restart F5 persistent k=750 run 0 done
+  receiver-restart receiver volatile k=250 run 1 done
+  receiver-restart receiver volatile k=500 run 1 done
+  receiver-restart receiver volatile k=750 run 1 done
+  receiver-restart receiver persistent k=250 run 1 done
+  receiver-restart receiver persistent k=500 run 1 done
+  receiver-restart receiver persistent k=750 run 1 done
+  receiver-restart both volatile k=250 run 1 done
+  receiver-restart both volatile k=500 run 1 done
+  receiver-restart both volatile k=750 run 1 done
+  receiver-restart both persistent k=250 run 1 done
+  receiver-restart both persistent k=500 run 1 done
+  receiver-restart both persistent k=750 run 1 done
+  receiver-restart F4 persistent k=250 run 1 done
+  receiver-restart F4 persistent k=500 run 1 done
+  receiver-restart F4 persistent k=750 run 1 done
+  receiver-restart F5 persistent k=250 run 1 done
+  receiver-restart F5 persistent k=500 run 1 done
+  receiver-restart F5 persistent k=750 run 1 done
+  receiver-restart receiver volatile k=250 run 2 done
+  receiver-restart receiver volatile k=500 run 2 done
+  receiver-restart receiver volatile k=750 run 2 done
+  receiver-restart receiver persistent k=250 run 2 done
+  receiver-restart receiver persistent k=500 run 2 done
+  receiver-restart receiver persistent k=750 run 2 done
+  receiver-restart both volatile k=250 run 2 done
+  receiver-restart both volatile k=500 run 2 done
+  receiver-restart both volatile k=750 run 2 done
+  receiver-restart both persistent k=250 run 2 done
+  receiver-restart both persistent k=500 run 2 done
+  receiver-restart both persistent k=750 run 2 done
+  receiver-restart F4 persistent k=250 run 2 done
+  receiver-restart F4 persistent k=500 run 2 done
+  receiver-restart F4 persistent k=750 run 2 done
+  receiver-restart F5 persistent k=250 run 2 done
+  receiver-restart F5 persistent k=500 run 2 done
+  receiver-restart F5 persistent k=750 run 2 done
+  receiver-restart receiver volatile k=250 run 3 done
+  receiver-restart receiver volatile k=500 run 3 done
+  receiver-restart receiver volatile k=750 run 3 done
+  receiver-restart receiver persistent k=250 run 3 done
+  receiver-restart receiver persistent k=500 run 3 done
+  receiver-restart receiver persistent k=750 run 3 done
+  receiver-restart both volatile k=250 run 3 done
+  receiver-restart both volatile k=500 run 3 done
+  receiver-restart both volatile k=750 run 3 done
+  receiver-restart both persistent k=250 run 3 done
+  receiver-restart both persistent k=500 run 3 done
+  receiver-restart both persistent k=750 run 3 done
+  receiver-restart F4 persistent k=250 run 3 done
+  receiver-restart F4 persistent k=500 run 3 done
+  receiver-restart F4 persistent k=750 run 3 done
+  receiver-restart F5 persistent k=250 run 3 done
+  receiver-restart F5 persistent k=500 run 3 done
+  receiver-restart F5 persistent k=750 run 3 done
+  receiver-restart receiver volatile k=250 run 4 done
+  receiver-restart receiver volatile k=500 run 4 done
+  receiver-restart receiver volatile k=750 run 4 done
+  receiver-restart receiver persistent k=250 run 4 done
+  receiver-restart receiver persistent k=500 run 4 done
+  receiver-restart receiver persistent k=750 run 4 done
+  receiver-restart both volatile k=250 run 4 done
+  receiver-restart both volatile k=500 run 4 done
+  receiver-restart both volatile k=750 run 4 done
+  receiver-restart both persistent k=250 run 4 done
+  receiver-restart both persistent k=500 run 4 done
+  receiver-restart both persistent k=750 run 4 done
+  receiver-restart F4 persistent k=250 run 4 done
+  receiver-restart F4 persistent k=500 run 4 done
+  receiver-restart F4 persistent k=750 run 4 done
+  receiver-restart F5 persistent k=250 run 4 done
+  receiver-restart F5 persistent k=500 run 4 done
+  receiver-restart F5 persistent k=750 run 4 done
+  receiver-restart receiver volatile k=250 run 5 done
+  receiver-restart receiver volatile k=500 run 5 done
+  receiver-restart receiver volatile k=750 run 5 done
+  receiver-restart receiver persistent k=250 run 5 done
+  receiver-restart receiver persistent k=500 run 5 done
+  receiver-restart receiver persistent k=750 run 5 done
+  receiver-restart both volatile k=250 run 5 done
+  receiver-restart both volatile k=500 run 5 done
+  receiver-restart both volatile k=750 run 5 done
+  receiver-restart both persistent k=250 run 5 done
+  receiver-restart both persistent k=500 run 5 done
+  receiver-restart both persistent k=750 run 5 done
+  receiver-restart F4 persistent k=250 run 5 done
+  receiver-restart F4 persistent k=500 run 5 done
+  receiver-restart F4 persistent k=750 run 5 done
+  receiver-restart F5 persistent k=250 run 5 done
+  receiver-restart F5 persistent k=500 run 5 done
+  receiver-restart F5 persistent k=750 run 5 done
+  receiver-restart receiver volatile k=250 run 6 done
+  receiver-restart receiver volatile k=500 run 6 done
+  receiver-restart receiver volatile k=750 run 6 done
+  receiver-restart receiver persistent k=250 run 6 done
+  receiver-restart receiver persistent k=500 run 6 done
+  receiver-restart receiver persistent k=750 run 6 done
+  receiver-restart both volatile k=250 run 6 done
+  receiver-restart both volatile k=500 run 6 done
+  receiver-restart both volatile k=750 run 6 done
+  receiver-restart both persistent k=250 run 6 done
+  receiver-restart both persistent k=500 run 6 done
+  receiver-restart both persistent k=750 run 6 done
+  receiver-restart F4 persistent k=250 run 6 done
+  receiver-restart F4 persistent k=500 run 6 done
+  receiver-restart F4 persistent k=750 run 6 done
+  receiver-restart F5 persistent k=250 run 6 done
+  receiver-restart F5 persistent k=500 run 6 done
+  receiver-restart F5 persistent k=750 run 6 done
+  receiver-restart receiver volatile k=250 run 7 done
+  receiver-restart receiver volatile k=500 run 7 done
+  receiver-restart receiver volatile k=750 run 7 done
+  receiver-restart receiver persistent k=250 run 7 done
+  receiver-restart receiver persistent k=500 run 7 done
+  receiver-restart receiver persistent k=750 run 7 done
+  receiver-restart both volatile k=250 run 7 done
+  receiver-restart both volatile k=500 run 7 done
+  receiver-restart both volatile k=750 run 7 done
+  receiver-restart both persistent k=250 run 7 done
+  receiver-restart both persistent k=500 run 7 done
+  receiver-restart both persistent k=750 run 7 done
+  receiver-restart F4 persistent k=250 run 7 done
+  receiver-restart F4 persistent k=500 run 7 done
+  receiver-restart F4 persistent k=750 run 7 done
+  receiver-restart F5 persistent k=250 run 7 done
+  receiver-restart F5 persistent k=500 run 7 done
+  receiver-restart F5 persistent k=750 run 7 done
+  receiver-restart receiver volatile k=250 run 8 done
+  receiver-restart receiver volatile k=500 run 8 done
+  receiver-restart receiver volatile k=750 run 8 done
+  receiver-restart receiver persistent k=250 run 8 done
+  receiver-restart receiver persistent k=500 run 8 done
+  receiver-restart receiver persistent k=750 run 8 done
+  receiver-restart both volatile k=250 run 8 done
+  receiver-restart both volatile k=500 run 8 done
+  receiver-restart both volatile k=750 run 8 done
+  receiver-restart both persistent k=250 run 8 done
+  receiver-restart both persistent k=500 run 8 done
+  receiver-restart both persistent k=750 run 8 done
+  receiver-restart F4 persistent k=250 run 8 done
+  receiver-restart F4 persistent k=500 run 8 done
+  receiver-restart F4 persistent k=750 run 8 done
+  receiver-restart F5 persistent k=250 run 8 done
+  receiver-restart F5 persistent k=500 run 8 done
+  receiver-restart F5 persistent k=750 run 8 done
+  receiver-restart receiver volatile k=250 run 9 done
+  receiver-restart receiver volatile k=500 run 9 done
+  receiver-restart receiver volatile k=750 run 9 done
+  receiver-restart receiver persistent k=250 run 9 done
+  receiver-restart receiver persistent k=500 run 9 done
+  receiver-restart receiver persistent k=750 run 9 done
+  receiver-restart both volatile k=250 run 9 done
+  receiver-restart both volatile k=500 run 9 done
+  receiver-restart both volatile k=750 run 9 done
+  receiver-restart both persistent k=250 run 9 done
+  receiver-restart both persistent k=500 run 9 done
+  receiver-restart both persistent k=750 run 9 done
+  receiver-restart F4 persistent k=250 run 9 done
+  receiver-restart F4 persistent k=500 run 9 done
+  receiver-restart F4 persistent k=750 run 9 done
+  receiver-restart F5 persistent k=250 run 9 done
+  receiver-restart F5 persistent k=500 run 9 done
+  receiver-restart F5 persistent k=750 run 9 done
+[receiver_restart] 180 rows -> /home/jonatan/Documentos/UFSC/SEGURANCA/trabalho-final/results/receiver_restart.csv
+
+failure | history | restart_after | encryptions | nonce_reuse | duplicate_acceptances | emitter_transactions | receiver_transactions | discarded_sequences | prep_median_us | prep_p95_us | lost | recovered | recovery_median_s
+receiver | volatile | 250 | 1000 [1000..1000] | 0 [0..0] | 20 [20..20] | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 245.5 [223..299] | 314.5 [284..386] | 0 [0..0] | 10/10 | 0.64
+receiver | volatile | 500 | 1000 [1000..1000] | 0 [0..0] | 20 [20..20] | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 246.5 [221..324] | 312 [285..464] | 0 [0..0] | 10/10 | 0.62
+receiver | volatile | 750 | 1000 [1000..1000] | 0 [0..0] | 20 [20..20] | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 248.5 [220..302] | 314 [299..456] | 0 [0..0] | 10/10 | 0.62
+receiver | persistent | 250 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 1000 [1000..1000] | 0 [0..0] | 237.75 [220..273.5] | 307 [293..472] | 0 [0..0] | 10/10 | 0.64
+receiver | persistent | 500 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 1000 [1000..1000] | 0 [0..0] | 260.5 [221..299] | 310.5 [285..409] | 0 [0..0] | 10/10 | 0.64
+receiver | persistent | 750 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 1000 [1000..1000] | 0 [0..0] | 269.25 [219..298] | 314.5 [309..421] | 0 [0..0] | 10/10 | 0.62
+both | volatile | 250 | 1000 [1000..1000] | 0 [0..0] | 20 [20..20] | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 252.5 [224..296] | 321 [301..449] | 0 [0..0] | 10/10 | 0.70
+both | volatile | 500 | 1000 [1000..1000] | 0 [0..0] | 20 [20..20] | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 248.5 [226..324] | 319.5 [307..458] | 0 [0..0] | 10/10 | 0.69
+both | volatile | 750 | 1000 [1000..1000] | 0 [0..0] | 20 [20..20] | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 273.5 [228..303] | 317.5 [300..459] | 0 [0..0] | 10/10 | 0.69
+both | persistent | 250 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 1000 [1000..1000] | 0 [0..0] | 236 [220..331] | 308 [295..498] | 0 [0..0] | 10/10 | 0.70
+both | persistent | 500 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 1000 [1000..1000] | 0 [0..0] | 239.5 [220..289.5] | 322 [271..451] | 0 [0..0] | 10/10 | 0.68
+both | persistent | 750 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 1000 [1000..1000] | 0 [0..0] | 262.5 [223..330] | 331 [291..508] | 0 [0..0] | 10/10 | 0.70
+F4 | persistent | 250 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 1000 [1000..1000] | 0 [0..0] | 288.5 [224..302] | 321.5 [295..518] | 0 [0..0] | 10/10 | 0.64
+F4 | persistent | 500 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 1000 [1000..1000] | 0 [0..0] | 247 [227..305] | 313.5 [301..508] | 0 [0..0] | 10/10 | 0.64
+F4 | persistent | 750 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 1000 [1000..1000] | 0 [0..0] | 242.5 [222..313] | 314 [284..505] | 0 [0..0] | 10/10 | 0.64
+F5 | persistent | 250 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 999 [999..999] | 0 [0..0] | 253.5 [220..299] | 311 [297..437] | 1 [1..1] | 10/10 | 0.64
+F5 | persistent | 500 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 999 [999..999] | 0 [0..0] | 252.5 [220..301] | 312 [275..448] | 1 [1..1] | 10/10 | 0.64
+F5 | persistent | 750 | 1000 [1000..1000] | 0 [0..0] | 0 [0..0] | 1000 [1000..1000] | 999 [999..999] | 0 [0..0] | 238 [220..295.5] | 308.5 [293..431] | 1 [1..1] | 10/10 | 0.64
+
+replays_sent / reached / accepted (summed per group):
+  ('receiver', 'volatile') [600, 600, 600]
+  ('receiver', 'persistent') [600, 600, 0]
+  ('both', 'volatile') [600, 600, 600]
+  ('both', 'persistent') [600, 600, 0]
+  ('F4', 'persistent') [600, 600, 0]
+  ('F5', 'persistent') [600, 600, 0]
